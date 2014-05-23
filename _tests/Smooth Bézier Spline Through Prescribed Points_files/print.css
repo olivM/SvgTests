@@ -1,0 +1,21 @@
+div.header,
+.menu,
+div.footer,
+div.social-bar,
+div.commentsblock,
+div.postinfo,
+div.social-footer,
+div.meta{display:none !important;}
+
+body {background:none; !important;}
+
+div.wrap, div.outer-wrap{border:0px !important;
+        margin:0px !important;
+        padding: 0px !important;
+        box-shadow:0px 0px !important;
+        width: 100% !important;}
+        
+#content, #content-full
+{
+display: block; !important;
+}

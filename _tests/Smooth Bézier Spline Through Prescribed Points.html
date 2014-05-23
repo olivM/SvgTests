@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)http://www.particleincell.com/blog/2012/bezier-splines/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Smooth Bézier Spline Through Prescribed Points</title>
+ 
+<meta name="description" content="How to construct a smooth line through a set of prescribed points? Also an interactive SVG demo that allows you to try this in real time."> 
+ 
+
+<link rel="stylesheet" href="./Smooth Bézier Spline Through Prescribed Points_files/style.css" type="text/css" media="screen, print">
+<link rel="stylesheet" href="./Smooth Bézier Spline Through Prescribed Points_files/print.css" type="text/css" media="print">
+
+<link rel="alternate" type="application/rss+xml" title="PIC-C Blog RSS Feed" href="http://www.particleincell.com/feed/">
+<link rel="pingback" href="http://www.particleincell.com/xmlrpc.php">
+<meta name="robots" content="index,follow">
+
+<link type="image/x-icon" rel="shortcut icon" href="http://www.particleincell.com/wp-content/themes/pic/images/favicon.ico">
+
+
+<link rel="stylesheet" id="wp-syntax-css-css" href="./Smooth Bézier Spline Through Prescribed Points_files/wp-syntax.css" type="text/css" media="all">
+<link rel="prev" title="Efficient Particle Data Structures" href="http://www.particleincell.com/blog/2012/particle-data-structure/">
+<link rel="next" title="Interactive Elliptic Mesh Generation with SVG and Javascript" href="http://www.particleincell.com/blog/2012/online-meshing-example/">
+<link rel="canonical" href="./Smooth Bézier Spline Through Prescribed Points_files/Smooth Bézier Spline Through Prescribed Points.html">
+<link rel="shortlink" href="http://www.particleincell.com/?p=474">
+<link href="./Smooth Bézier Spline Through Prescribed Points_files/neutral.css" type="text/css" rel="stylesheet">	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+<style type="text/css">
+/* <![CDATA[ */
+img.latex { vertical-align: middle; border: none; }
+/* ]]> */
+</style>
+
+<style type="text/css"></style></head>
+
+<body data-twttr-rendered="true">
+
+<div class="outer-wrap">
+<div class="wrap">
+	<div class="header">
+	<img src="./Smooth Bézier Spline Through Prescribed Points_files/header.png" width="734px" height="84px" alt="PIC-C, Particle In Cell Consulting, LLC. Plasma physics and rarefied gas simulation codes.">
+
+
+		
+	</div> 
+
+	<div class="menu">
+<nav><ul>
+	<li><a href="http://www.particleincell.com/" title="About Particle In Cell Consulting, LLC">Home</a></li>
+<li class="selected"><a href="http://www.particleincell.com/blog/" title="View our scientific computing and plasma physics blog">Blog</a></li>
+<li><a href="https://www.particleincell.com/pic_fundamentals" title="Register for Fundamentals of the Particle In Cell Method">Course</a></li>
+<li><a href="https://www.particleincell.com/jobs" title="Current openings">Jobs</a></li>
+<li><a href="http://www.particleincell.com/projects/" title="Read about our current projects">Projects</a></li>
+<li><a href="http://www.particleincell.com/newsletter/" title="Sign up for our newsletter">Newsletter</a></li>
+<li><a href="http://www.particleincell.com/contact/" title="Email us with questions or RFPs">Contact Us</a></li>
+	
+</ul></nav>
+
+</div>
+	</div>
+
+
+<div class="social-bar">
+<iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="./Smooth Bézier Spline Through Prescribed Points_files/tweet_button.1400006231.html" class="twitter-share-button twitter-tweet-button twitter-share-button twitter-count-vertical" title="Twitter Tweet Button" data-twttr-rendered="true" style="width: 56px; height: 62px;"></iframe>
+<script src="./Smooth Bézier Spline Through Prescribed Points_files/cb=gapi.loaded_1" async=""></script><script src="./Smooth Bézier Spline Through Prescribed Points_files/cb=gapi.loaded_0" async=""></script><script type="text/javascript" async="" src="./Smooth Bézier Spline Through Prescribed Points_files/ga.js"></script><script type="text/javascript" async="" src="./Smooth Bézier Spline Through Prescribed Points_files/plusone.js" gapi_processed="true"></script><script id="twitter-wjs" src="./Smooth Bézier Spline Through Prescribed Points_files/widgets.js"></script><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+<div id="___plusone_0" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 50px; height: 60px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 50px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 60px;" tabindex="0" vspace="0" width="100%" id="I0_1400858157581" name="I0_1400858157581" src="./Smooth Bézier Spline Through Prescribed Points_files/fastbutton.html" data-gapiattached="true" title="+1"></iframe></div>
+</div>
+
+<div id="content" class="wrap">
+
+		<div class="entry">
+		<article>	
+	  
+		<h1><a href="./Smooth Bézier Spline Through Prescribed Points_files/Smooth Bézier Spline Through Prescribed Points.html">Smooth Bézier Spline Through Prescribed Points</a></h1> 
+		
+	        <a href="https://www.particleincell.com/pic_fundamentals#register"><img src="./Smooth Bézier Spline Through Prescribed Points_files/pic_fund.png" title="Register Now" width="487px" height="101px" class="banner"></a>
+		<div class="meta">
+		Posted on June 17th, 2012 
+				<br>
+				<a class="nav-link" href="http://www.particleincell.com/blog/2012/particle-data-structure/" title="Efficient Particle Data Structures">Previous Article</a>
+				
+		 :: 		
+				<a class="nav-link" href="http://www.particleincell.com/blog/2012/online-meshing-example/" title="Interactive Elliptic Mesh Generation with SVG and Javascript">Next Article</a>
+				
+		</div>
+        <div class="clear"></div>
+	 
+	<p>In this article we show you how to generate a smooth spline through a set of prescribed points. The article also contains an <a href="http://www.particleincell.com/2012/bezier-splines/#demo">interactive SVG demo</a> that allows you to try this in real time. This demo may not work if you are <a href="http://feedburner.google.com/fb/a/mailverify?uri=particleincell">reading this post through email</a> or on a mobile device. In that case, please <a href="http://www.particleincell.com/2012/bezier-splines">visit the article</a> from your computer browser.</p>
+<h2>Introduction</h2>
+<p>In scientific computing, we often need to construct a line that passes through a set of prescribed controlled points, or <i>knots</i>. A common example is mesh generation. Even if we utilize a mesh-free method, we need to somehow prescribe the outer extent for the problem. This is typically accomplished by specifying boundary splines (the counterpart in 3D are <a href="http://en.wikipedia.org/wiki/B%C3%A9zier_surface">patches</a>). </p>
+<h2>Bézier Splines</h2>
+<p>Spline is a collection of polygonal segments. The segments can be linear, quadratic, cubic, or even higher order polynomials. In this article we derive the equations needed to draw a smooth curve through a set of control points using the cubic Bézier polynomial. Wikipedia has a very nice article on <a href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve" class="ext">Bézier curves</a> that includes animations that show how these polynomials work.</p>
+<p>The cubic Bézier curve is given by<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex.php" alt="\mathbf{B}(t)=(1-t)^3\mathbf{P}_0 + 3(1-t)^2t\mathbf{P}_1 + 3(1-t)t^2\mathbf{P}_2 + t^3\mathbf{P}_3, \quad t\in [0,1]" title="\mathbf{B}(t)=(1-t)^3\mathbf{P}_0 + 3(1-t)^2t\mathbf{P}_1 + 3(1-t)t^2\mathbf{P}_2 + t^3\mathbf{P}_3, \quad t\in [0,1]" class="latex"><br>
+this can be rewritten as<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(1).php" alt="\mathbf{B}(t)=(1-t)^3\mathbf{P}_0 + 3(t-2t^2+t^3)\mathbf{P}_1 + 3(t^2-t^3)\mathbf{P}_2 + t^3\mathbf{P}_3" title="\mathbf{B}(t)=(1-t)^3\mathbf{P}_0 + 3(t-2t^2+t^3)\mathbf{P}_1 + 3(t^2-t^3)\mathbf{P}_2 + t^3\mathbf{P}_3" class="latex"></p>
+<p>In this definition, the points 0 and 3 correspond to the end points (the knots). The other two points are control points that determine the shape of the curve. The curve does not in general pass through these points. Following the steps outlined on <a href="http://www.codeproject.com/Articles/31859/Draw-a-Smooth-Curve-through-a-Set-of-2D-Points-wit">codeproject.com</a>, we want the first and second derivatives to be continuous across the spline boundary. This will give us two equations (one for each derivative) at each spline interface which we use to find the control points.</p>
+<p>The first derivative is given by<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(2).php" alt="\mathbf{B}&#39;(t) = -3(1-t)^2 \mathbf{P}_0 + 3(1-4t+3t^2)\mathbf{P}_1 + 3(2t-3t^2)\mathbf{P}_2 +3t^2\mathbf{P}_3" title="\mathbf{B}&#39;(t) = -3(1-t)^2 \mathbf{P}_0 + 3(1-4t+3t^2)\mathbf{P}_1 + 3(2t-3t^2)\mathbf{P}_2 +3t^2\mathbf{P}_3" class="latex"><br>
+At the left boundary of an “i-th” segment we can write<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(3).php" alt="\mathbf{B}&#39;_i(0)=\mathbf{B}&#39;_{i-1}(1)" title="\mathbf{B}&#39;_i(0)=\mathbf{B}&#39;_{i-1}(1)" class="latex"><br>
+or<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(4).php" alt="-3\mathbf{P}_{0,i}+3\mathbf{P}_{1,i}=-3\mathbf{P}_{2,i-1}+3\mathbf{P}_{3,i-1}" title="-3\mathbf{P}_{0,i}+3\mathbf{P}_{1,i}=-3\mathbf{P}_{2,i-1}+3\mathbf{P}_{3,i-1}" class="latex"><br>
+Now, since the curve is continuous, <img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(5).php" alt="\mathbf{P}_{0,i}=\mathbf{P}_{3,i-1}=\mathbf{K}_i" title="\mathbf{P}_{0,i}=\mathbf{P}_{3,i-1}=\mathbf{K}_i" class="latex">, the “i-th” knot point, and we can simplify this expression as (1)<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(6).php" alt="2\mathbf{K}_i=\mathbf{P}_{1,i}+\mathbf{P}_{2,i-1} \quad\quad\quad(1)" title="2\mathbf{K}_i=\mathbf{P}_{1,i}+\mathbf{P}_{2,i-1} \quad\quad\quad(1)" class="latex"></p>
+<p>We also want the second derivative to be continuous. The second derivative is given by<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(7).php" alt="\mathbf{B}&#39;&#39;(t)= 6(1-t)\mathbf{P}_0+3(-4+6t)\mathbf{P}_1+3(2-6t)\mathbf{P}_2+6t\mathbf{P}_3" title="\mathbf{B}&#39;&#39;(t)= 6(1-t)\mathbf{P}_0+3(-4+6t)\mathbf{P}_1+3(2-6t)\mathbf{P}_2+6t\mathbf{P}_3" class="latex"><br>
+at the boundary we have<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(8).php" alt="6 \mathbf{P}_{0,i}-12\mathbf{P}_{1,i}+6\mathbf{P}_{2,i}=6\mathbf{P}_{1,i-1}-12\mathbf{P}_{2,i-1}+6\mathbf{P}_{3,i-1}" title="6 \mathbf{P}_{0,i}-12\mathbf{P}_{1,i}+6\mathbf{P}_{2,i}=6\mathbf{P}_{1,i-1}-12\mathbf{P}_{2,i-1}+6\mathbf{P}_{3,i-1}" class="latex"><br>
+Simplifying and taking into account the shared knot point, we get equation (2),<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(9).php" alt="-2\mathbf{P}_{1,i}+\mathbf{P}_{2,i}=\mathbf{P}_{1,i-1}-2\mathbf{P}_{2,i-1} \quad\quad\quad(2)" title="-2\mathbf{P}_{1,i}+\mathbf{P}_{2,i}=\mathbf{P}_{1,i-1}-2\mathbf{P}_{2,i-1} \quad\quad\quad(2)" class="latex"></p>
+<p>The equations (1) and (2) are defined only at the internal knots – places where two segments come together. Mathematically, this means that we have <img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(10).php" alt="2(n-1)" title="2(n-1)" class="latex"> equations for <img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(11).php" alt="2n" title="2n" class="latex"> unknowns. In order to close the system, we prescribe two more natural boundary conditions, <img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(12).php" alt="\mathbf{B}&#39;&#39;_0(0)=0" title="\mathbf{B}&#39;&#39;_0(0)=0" class="latex"> and <img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(13).php" alt="\mathbf{B}&#39;&#39;_{n-1}(1)=0" title="\mathbf{B}&#39;&#39;_{n-1}(1)=0" class="latex">. In other words, the spline becomes linear at the end points. These two remaining equations (3) and (4) are<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(14).php" alt="\mathbf{K}_0-2\mathbf{P}_{1,0}+\mathbf{P}_{2,0}=0 \quad\quad\quad(3)" title="\mathbf{K}_0-2\mathbf{P}_{1,0}+\mathbf{P}_{2,0}=0 \quad\quad\quad(3)" class="latex"><br>
+and<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(15).php" alt="\mathbf{P}_{1,n-1}-2\mathbf{P}_{2,n-1}+\mathbf{K}_n=0 \quad\quad\quad(4)" title="\mathbf{P}_{1,n-1}-2\mathbf{P}_{2,n-1}+\mathbf{K}_n=0 \quad\quad\quad(4)" class="latex"></p>
+<p>We can further simplify this system by substituting (1) into (2) to obtain<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(16).php" alt="\mathbf{P}_{1,i-1}+4\mathbf{P}_{1,i}+\mathbf{P}_{1,i+1}=4\mathbf{K}_i+2\mathbf{K}_{i+1} \quad\quad i\in[1,n-2]" title="\mathbf{P}_{1,i-1}+4\mathbf{P}_{1,i}+\mathbf{P}_{1,i+1}=4\mathbf{K}_i+2\mathbf{K}_{i+1} \quad\quad i\in[1,n-2]" class="latex">.<br>
+On the boundary nodes we have from (3) and (4)<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(17).php" alt="2\mathbf{P}_{1,0}+\mathbf{P}_{1,1}=\mathbf{K}_0+2\mathbf{K}_1" title="2\mathbf{P}_{1,0}+\mathbf{P}_{1,1}=\mathbf{K}_0+2\mathbf{K}_1" class="latex"><br>
+and<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(18).php" alt="2\mathbf{P}_{1,n-2}+7\mathbf{P}_{1,n-1} = 8\mathbf{K}_{n-1}+\mathbf{K}_n" title="2\mathbf{P}_{1,n-2}+7\mathbf{P}_{1,n-1} = 8\mathbf{K}_{n-1}+\mathbf{K}_n" class="latex"></p>
+<p>This is a tri-diagonal system for <img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(19).php" alt="P_1" title="P_1" class="latex"> which we can solve using the <a href="http://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm">Thomas algorithm</a>. Once we determine <img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(20).php" alt="\mathbf{P}_1" title="\mathbf{P}_1" class="latex">, we obtain <img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(21).php" alt="\mathbf{P}_2" title="\mathbf{P}_2" class="latex"> from equations (1) and (4),<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(22).php" alt="\mathbf{P}_{2,i}=2\mathbf{K}_{i}-\mathbf{P}_{1,i} \quad\quad i\in [0,n-2]" title="\mathbf{P}_{2,i}=2\mathbf{K}_{i}-\mathbf{P}_{1,i} \quad\quad i\in [0,n-2]" class="latex"><br>
+and<br>
+<img src="./Smooth Bézier Spline Through Prescribed Points_files/latex(23).php" alt="\mathbf{P}_{2,n-1}= (1/2)(\mathbf{K}_n+\mathbf{P}_{1,n-1})" title="\mathbf{P}_{2,n-1}= (1/2)(\mathbf{K}_n+\mathbf{P}_{1,n-1})" class="latex"></p>
+<h2><a name="demo"></a>Interactive Demo</h2>
+<p>Below you will find an interactive demo that implements this algorithm. If everything loaded fine, you should see four yellow circles connected by a smooth line composed of three differently colored segments. You can move any of the circles with the mouse. If you don’t see the circles, cannot move them, or the spline is not smooth, first try reloading the page. If that still fails, try a different browser. The demo worked for me with Chrome, Firefox, and Internet Explorer 9 under Windows. I couldn’t get it working on my Android phone (no graphics rendered) and a friend reported it didn’t work on iPad either. If you know how to get the demo working on these mobile devices, please let me know by leaving a comment below.</p>
+<p>This demo uses <a href="http://www.w3.org/Graphics/SVG/IG/resources/svgprimer.html">SVG</a> and Javascript (You can find a TON of SVG examples on <a href="http://srufaculty.sru.edu/david.dailey/svg/">Prof. Dailey’s website</a>. Another good resource is the <a href="http://www.petercollingridge.co.uk/svg-tutorial">SVG tutorial</a> on “Peter’s Website”). SVG (Scalable Vector Graphics) is one of two ways you can get interactive graphics in your website (the other being HTML5′s <a href="http://www.particleincell.com/2011/html5-for-scientific-computing/"><tt>&lt;canvas&gt;</tt> element</a>). Of these two, SVG seems to be much more versatile. There are even free vector graphics programs out there, such as <a href="http://inkscape.org/">Inkscape</a>, which save the images in the SVG format. The three lines connecting the circles are defined using SVG’s Bézier cubic path syntax. Whenever you drag a circle, the code recomputes the control points and updates the path definition. Your browser then automatically repaints the view. Pretty nifty! You will find the complete code below.</p>
+<p><embed id="circles" src="http://www.particleincell.com/wp-content/uploads/2012/06/circles.svg" type="image/svg+xml" height="500" width="840" style="border:1px solid black;" alt="interactive SVG spline interpolation demo"></p>
+<h2>Source Code</h2>
+<p>You can download the source code here: <a href="http://www.particleincell.com/wp-content/uploads/2012/06/circles.svg">circles.svg</a>. The image is embedded using the <tt>&lt;embed&gt;</tt> tag. You can also see just the Javascript: <a href="http://www.particleincell.com/wp-content/uploads/2012/06/bezier-spline.js">bezier-spline.js</a> (this code is embedded inside the SVG).</p>
+<p>As a side note, it took me way too long to get the code running. Javascript is different from Java in that, among other things, it does not define variable types. Initially, the code was using</p>
+
+<div class="wp_syntax"><table><tbody><tr><td class="code"><pre class="java" style="font-family:monospace;"><span style="color: #000000; font-weight: bold;">for</span> <span style="color: #009900;">(</span>i<span style="color: #339933;">=</span><span style="color: #cc66cc;">0</span><span style="color: #339933;">;</span>i<span style="color: #339933;">&lt;</span><span style="color: #cc66cc;">4</span><span style="color: #339933;">;</span>i<span style="color: #339933;">++</span><span style="color: #009900;">)</span>
+<span style="color: #009900;">{</span>
+    x<span style="color: #009900;">[</span>i<span style="color: #009900;">]</span><span style="color: #339933;">=</span>V<span style="color: #009900;">[</span>i<span style="color: #009900;">]</span>.<span style="color: #006633;">getAttributeNS</span><span style="color: #009900;">(</span><span style="color: #000066; font-weight: bold;">null</span>,<span style="color: #0000ff;">"cx"</span><span style="color: #009900;">)</span>
+    y<span style="color: #009900;">[</span>i<span style="color: #009900;">]</span><span style="color: #339933;">=</span>V<span style="color: #009900;">[</span>i<span style="color: #009900;">]</span>.<span style="color: #006633;">getAttributeNS</span><span style="color: #009900;">(</span><span style="color: #000066; font-weight: bold;">null</span>,<span style="color: #0000ff;">"cy"</span><span style="color: #009900;">)</span>
+<span style="color: #009900;">}</span></pre></td></tr></tbody></table></div>
+
+<p>to obtain the coordinates of the four control points. These were then passed to another function which performed the actual computation. The problem was, this actually resulted in <tt>x[i]</tt> being a string and not an integer. Javascript did not complain about this. Instead, where required it automatically converted the string to an int. However, the plus operator resulted in string concatenation instead of addition of two numbers. For example, for <tt>x[i]="50"</tt>, <tt>x[i]+30</tt> resulted in 5030 instead of the expected value of 80. For the longest time I was getting really funky results and could not figure out why despite rechecking my math multiple times. I finally found the bug by stepping through the code with the Javascript debugger that comes with Chrome. The simple fix was to force the conversion to integer,</p>
+
+<div class="wp_syntax"><table><tbody><tr><td class="code"><pre class="java" style="font-family:monospace;"><span style="color: #000000; font-weight: bold;">for</span> <span style="color: #009900;">(</span>i<span style="color: #339933;">=</span><span style="color: #cc66cc;">0</span><span style="color: #339933;">;</span>i<span style="color: #339933;">&lt;</span><span style="color: #cc66cc;">4</span><span style="color: #339933;">;</span>i<span style="color: #339933;">++</span><span style="color: #009900;">)</span>
+<span style="color: #009900;">{</span>
+    <span style="color: #666666; font-style: italic;">/*use parseInt to convert string to int*/</span>
+    x<span style="color: #009900;">[</span>i<span style="color: #009900;">]</span><span style="color: #339933;">=</span>parseInt<span style="color: #009900;">(</span>V<span style="color: #009900;">[</span>i<span style="color: #009900;">]</span>.<span style="color: #006633;">getAttributeNS</span><span style="color: #009900;">(</span><span style="color: #000066; font-weight: bold;">null</span>,<span style="color: #0000ff;">"cx"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span>
+    y<span style="color: #009900;">[</span>i<span style="color: #009900;">]</span><span style="color: #339933;">=</span>parseInt<span style="color: #009900;">(</span>V<span style="color: #009900;">[</span>i<span style="color: #009900;">]</span>.<span style="color: #006633;">getAttributeNS</span><span style="color: #009900;">(</span><span style="color: #000066; font-weight: bold;">null</span>,<span style="color: #0000ff;">"cy"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span>
+<span style="color: #009900;">}</span></pre></td></tr></tbody></table></div>
+
+<p>Also make sure to checkout the <a href="http://www.particleincell.com/2012/online-meshing-example/">interactive online mesh generator</a> follow up article and an article on <a href="http://www.particleincell.com/blog/2013/cubic-line-intersection/">computing intersection between a cubic Bezier curve and a line</a>.</p>
+<span style="display:inline-block;text-shadow: 1px 1px #DDD;margin: 0.5em 0;font-size: 1.2em;border-bottom: 2px dotted #444;"><a href="http://www.particleincell.com/newsletter">Subscribe to the newsletter</a> and follow us on <a href="https://twitter.com/particleincell/">Twitter</a>. Send us an <a href="http://www.particleincell.com/contact/">email</a> if you have any questions.</span>			</article>
+	
+	<div class="postinfo"> 
+		
+        		
+			
+	</div>	
+						
+   
+	        
+		<div class="commentsblock">
+				<h3 id="comments">8 comments to “Smooth Bézier Spline Through Prescribed Points”</h3>
+ 
+	<ol class="commentlist">
+		 
+<li class="comment byuser comment-author-admin bypostauthor even thread-even depth-1" id="li-comment-3291" name="comment-3291">
+   <div class="comment-author vcard">
+      <div class="comment-meta">
+	  <a href="http://www.particleincell.com/about#lubos" rel="external " class="url">Lubos</a></div>
+       <small>June 18, 2012 at 7:06 am</small>
+     <div class="clear"></div>
+ 
+      
+     <div class="comment-text">	
+         <p>You will also find a lot of information on Bezier splines, including interactive HTML5 canvas demos at <a href="http://processingjs.nihongoresources.com/bezierinfo/">http://processingjs.nihongoresources.com/bezierinfo/</a></p>
+     </div>
+ 
+   <div class="reply">
+      <a class="comment-reply-link" href="http://www.particleincell.com/blog/2012/bezier-splines/?replytocom=3291#respond" onclick="return addComment.moveForm(&quot;comment-3291&quot;, &quot;3291&quot;, &quot;respond&quot;, &quot;474&quot;)">Reply</a>   </div>
+   <div class="clear"></div>
+</div></li><!-- #comment-## -->
+ 
+<li class="comment byuser comment-author-admin bypostauthor odd alt thread-odd thread-alt depth-1" id="li-comment-3309" name="comment-3309">
+   <div class="comment-author vcard">
+      <div class="comment-meta">
+	  <a href="http://www.particleincell.com/about#lubos" rel="external " class="url">Lubos</a></div>
+       <small>June 19, 2012 at 7:32 am</small>
+     <div class="clear"></div>
+ 
+      
+     <div class="comment-text">	
+         <p>I also just found out this doesn’t work in Firefox 10 due to a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=280391">bug</a> that got fixed in FF11. In 10, the spline doesn’t update since the code to svg.getElementById(‘id’) returns an exception, “Component returned failure code: 0×80004001 (NS_ERROR_NOT_IMPLEMENTED) [nsIDOMSVGSVGElement.getElementById]”</p>
+<p><b>Update 6/20/2012:</b> I modified the code to create the SVG elements dynamically. This also eliminated the need for the getElementById call so the new version should work in FF10 as well.</p>
+     </div>
+ 
+   <div class="reply">
+      <a class="comment-reply-link" href="http://www.particleincell.com/blog/2012/bezier-splines/?replytocom=3309#respond" onclick="return addComment.moveForm(&quot;comment-3309&quot;, &quot;3309&quot;, &quot;respond&quot;, &quot;474&quot;)">Reply</a>   </div>
+   <div class="clear"></div>
+</div></li><!-- #comment-## -->
+ 
+<li class="comment even thread-even depth-1" id="li-comment-3327" name="comment-3327">
+   <div class="comment-author vcard">
+      <div class="comment-meta">
+	  Oswald</div>
+       <small>June 20, 2012 at 1:12 pm</small>
+     <div class="clear"></div>
+ 
+      
+     <div class="comment-text">	
+         <p>The Bezier curve renders on my Asus Prime tablet with Android ICS (it will probably work on my iPad3 as well), and I did get some touch-related functionality working (but only partially).</p>
+<p>Btw, you might enjoy some of this SVG eye-candy:<br>
+<a href="https://code.google.com/p/svg-filters-graphics/">https://code.google.com/p/svg-filters-graphics/</a></p>
+     </div>
+ 
+   <div class="reply">
+      <a class="comment-reply-link" href="http://www.particleincell.com/blog/2012/bezier-splines/?replytocom=3327#respond" onclick="return addComment.moveForm(&quot;comment-3327&quot;, &quot;3327&quot;, &quot;respond&quot;, &quot;474&quot;)">Reply</a>   </div>
+   <div class="clear"></div>
+</div></li><!-- #comment-## -->
+ 
+<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-9513" name="comment-9513">
+   <div class="comment-author vcard">
+      <div class="comment-meta">
+	  Doug Amos</div>
+       <small>August 16, 2013 at 7:13 am</small>
+     <div class="clear"></div>
+ 
+      
+     <div class="comment-text">	
+         <p>It would be nice to see and example of a closed path</p>
+     </div>
+ 
+   <div class="reply">
+      <a class="comment-reply-link" href="http://www.particleincell.com/blog/2012/bezier-splines/?replytocom=9513#respond" onclick="return addComment.moveForm(&quot;comment-9513&quot;, &quot;9513&quot;, &quot;respond&quot;, &quot;474&quot;)">Reply</a>   </div>
+   <div class="clear"></div>
+</div></li><!-- #comment-## -->
+ 
+<li class="comment even thread-even depth-1" id="li-comment-9983" name="comment-9983">
+   <div class="comment-author vcard">
+      <div class="comment-meta">
+	  Blewog</div>
+       <small>October 31, 2013 at 6:08 am</small>
+     <div class="clear"></div>
+ 
+      
+     <div class="comment-text">	
+         <p>Hi</p>
+<p>Great, very useful.</p>
+<p>But is there a typo in calculating P2 after solving the TDMA?<br>
+Should it be P2(i) = 2K(i+1) – P1(i+1)</p>
+     </div>
+ 
+   <div class="reply">
+      <a class="comment-reply-link" href="http://www.particleincell.com/blog/2012/bezier-splines/?replytocom=9983#respond" onclick="return addComment.moveForm(&quot;comment-9983&quot;, &quot;9983&quot;, &quot;respond&quot;, &quot;474&quot;)">Reply</a>   </div>
+   <div class="clear"></div>
+</div></li><!-- #comment-## -->
+	</ol>
+	<div class="clear"></div>
+	<div class="comment-navigation">
+		<div class="older"></div>
+		<div class="newer"></div>
+	</div>
+  
+ 
+ 
+<div id="respond">
+ 
+<h3>Leave a Reply</h3>
+ 
+<div class="cancel-comment-reply">
+	<small><a rel="nofollow" id="cancel-comment-reply-link" href="http://www.particleincell.com/blog/2012/bezier-splines/#respond" style="display:none;">Click here to cancel reply.</a></small>
+</div>
+ 
+ 
+<form action="http://www.particleincell.com/wp-comments-post.php" method="post" id="commentform">
+ 
+ 
+<p><input type="text" name="author" id="author" value="" size="22" tabindex="1" aria-required="true">
+<label for="author"><small>Name (required)</small></label></p>
+ 
+<p><input type="text" name="email" id="email" value="" size="22" tabindex="2" aria-required="true">
+<label for="email"><small>Mail (will not be published) (required)</small></label></p>
+ 
+<p><input type="text" name="url" id="url" value="" size="22" tabindex="3">
+<label for="url"><small>Website</small></label></p>
+ 
+  
+<p><textarea name="comment" id="comment" cols="100%" rows="10" tabindex="4"></textarea></p>
+<p><small>You can use these tags: <code>&lt;a href="" title=""&gt; &lt;abbr title=""&gt; &lt;acronym title=""&gt; &lt;b&gt; &lt;blockquote cite=""&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=""&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=""&gt; &lt;strike&gt; &lt;strong&gt; </code>In addition, you can use<code>$latex ...$</code> to include equations.</small></p>
+
+<p><input name="submit" type="submit" id="submit" tabindex="5" value="Post">
+<input type="hidden" name="comment_post_ID" value="474" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p>
+<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="dab511c4b6"></p> 
+</form>
+ 
+</div>
+ 
+		</div>
+	</div>
+	
+			
+		
+</div>
+
+<script type="text/javascript" src="./Smooth Bézier Spline Through Prescribed Points_files/comment-reply.min.js"></script>
+
+<div class="footer">
+<span class="alignright"><div id="___plus_0" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 170px; height: 85px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 170px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 85px;" tabindex="0" vspace="0" width="100%" id="I1_1400858157627" name="I1_1400858157627" src="./Smooth Bézier Spline Through Prescribed Points_files/badge.html" data-gapiattached="true" title="+Badge"></iframe></div></span><a href="http://www.particleincell.com/projects/">projects</a> : 
+<a href="http://www.particleincell.com/projects/sitemap">sitemap</a> : 
+<a href="http://www.particleincell.com/projects/blog">blog</a> : 
+<a href="http://www.particleincell.com/newsletter">subscribe</a> : 
+<a href="http://www.particleincell.com/contact">contact us</a> <br>
+(c) 2010-2014, Particle In Cell Consulting LLC, Falls Church, VA<br>
+You will also find us on <a href="https://plus.google.com/+Particleincell">Google+</a> 
+and on <a href="https://twitter.com/#!/particleincell">Twitter</a>.
+
+<br><br><b>Latest articles:</b>
+<a href="http://www.particleincell.com/blog/2014/2d-data-plotting/">2D Data Plotting</a> : <a href="http://www.particleincell.com/blog/2014/colormap/">Converting Scalars to RGB Colormap</a> : <a href="http://www.particleincell.com/blog/2014/flow-in-a-nozzle/">Flow in a Nozzle</a> : <a href="http://www.particleincell.com/blog/2013/iepc2013-debrief/">IEPC2013 Debrief</a> : <a href="http://www.particleincell.com/blog/2013/scammers-everywhere/">Scammers Everywhere</a>
+	    
+</div>
+
+</div> 
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10172387-4']);
+  _gaq.push(['_trackPageview']);
+  setTimeout(function() {
+  window.onscroll = function() {
+    window.onscroll = null; 
+    _gaq.push(['_trackEvent', 'scroll', 'read']);
+    }
+  }, 5000);
+  
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+
+<iframe name="oauth2relay376574120" id="oauth2relay376574120" src="./Smooth Bézier Spline Through Prescribed Points_files/postmessageRelay.html" tabindex="-1" style="width: 1px; height: 1px; position: absolute; top: -100px;"></iframe></body><style type="text/css">embed[type*="application/x-shockwave-flash"],embed[src*=".swf"],object[type*="application/x-shockwave-flash"],object[codetype*="application/x-shockwave-flash"],object[src*=".swf"],object[codebase*="swflash.cab"],object[classid*="D27CDB6E-AE6D-11cf-96B8-444553540000"],object[classid*="d27cdb6e-ae6d-11cf-96b8-444553540000"],object[classid*="D27CDB6E-AE6D-11cf-96B8-444553540000"]{	display: none !important;}</style></html>
