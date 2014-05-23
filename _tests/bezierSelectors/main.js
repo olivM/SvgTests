@@ -5,17 +5,16 @@ jQuery(function() {
 var BezierSelectors = {
 
 	paper: null,
-	nbSelectors: 1,
+	nbSelectors: 5,
 	selectors: {},
 	curves: {},
 	width: jQuery(window).width(),
 	height: jQuery(window).height(),
 	steps: 5,
-	margin: 150,
+	margin: 50,
 
 	setup: function() {
 		this.paper = Raphael('bezierSelector', this.width - 50, this.height - 50)
-		this.paper.clear();
 		var i;
 		for (i = 1; i <= this.nbSelectors; i++) {
 			this.selectors[i] = new BezierSelector({
@@ -39,7 +38,7 @@ var BezierSelectors = {
 	},
 
 	curveWidth: function() {
-		return this.width - (this.margin * 2) / (this.nbSelectors + 1);
+		return (this.width - (this.margin * 2)) / (this.nbSelectors + 1);
 	},
 	curveHeight: function() {
 		return this.height - (this.margin * 2);
@@ -95,6 +94,8 @@ var BezierSelectorCurve = function(args) {
 				_[k] = v;
 			});
 
+			console.log(this.env.curveWidth());
+
 			if (this.start) {
 				this.A = this.start.position();
 			} else {
@@ -112,13 +113,13 @@ var BezierSelectorCurve = function(args) {
 				this.B = this.end.position();
 			} else {
 				this.B = {
-					x: this.env.margin + this.env.curveWidth() * (this.name + 1),
+					x: this.env.margin + this.env.curveWidth() * (this.name - 1),
 					y: this.env.margin + this.env.curveHeight()
 				};
 			}
 
 			this.Bc = {
-				x: this.B.x + this.env.curveWidth() / 2,
+				x: this.B.x - this.env.curveWidth() / 2,
 				y: this.B.y
 			};
 
@@ -127,6 +128,7 @@ var BezierSelectorCurve = function(args) {
 
 		// Draw the curve and control paths if necessary
 		draw: function() {
+			console.log(this.A);
 			this.env.paper.path(this.connectPath()).toBack();
 		},
 
@@ -134,7 +136,6 @@ var BezierSelectorCurve = function(args) {
 		connectPath: function() {
 			var p = [],
 				path = '';
-			console.log(this);
 			p.push("M" + this.A.x + " " + this.A.y + " ");
 			p.push("C" + this.Ac.x + " " + this.Ac.y);
 			p.push(" " + this.Bc.x + " " + this.Bc.y);
