@@ -14,7 +14,7 @@ var BezierSelectors = {
 	margin: 50,
 
 	setup: function() {
-		this.paper = Raphael('bezierSelector', this.width - 50, this.height - 50)
+		this.paper = Raphael('bezierSelector', this.width, this.height)
 		var i;
 		for (i = 1; i <= this.nbSelectors; i++) {
 			this.selectors[i] = new BezierSelector({
@@ -25,7 +25,8 @@ var BezierSelectors = {
 			});
 			this.createCurve(i - 0.5, this.selectors[i - 1], this.selectors[i]);
 		}
-		this.createCurve(i + 0.5, this.selectors[i], null);
+		this.createCurve(i - 0.5, this.selectors[i - 1], this.selectors[i]);
+		// this.createCurve(i + 0.5, this.selectors[i], null);
 		this.draw();
 	},
 	createCurve: function(idx, start, end) {
@@ -57,21 +58,96 @@ var BezierSelector = function(args) {
 		name: null,
 		steps: null,
 		value: null,
+		tmp_value: null,
+		tmp_pos: null,
+		handlerRadius: 30,
+		handler: null,
 
 		setup: function(args) {
 			jQuery.each(args, function(k, v) {
 				_[k] = v;
 			});
+			console.log("value : " + this.value);
+			this.tmp_pos = this.env.margin + this.value * this.env.curveHeight() / this.env.steps;
+			this.drawPoint();
 			return this;
 		},
 		value: function() {
 			return this.value;
 		},
+		setValue: function() {
+			this.value = Math.max(0, Math.min(this.steps, Math.round((this.handler.attr('cy') - this.env.margin) / this.env.curveHeight() * this.steps)));
+			console.log(this.value);
+			this.handler.attr({
+				cy: this.env.margin + this.value * this.env.curveHeight() / this.env.steps
+			});
+			this.updateCurves(250);
+		},
+		setTmpValue: function() {
+			this.tmp_value = Math.max(0, Math.min(this.steps, Math.round((this.handler.attr('cy') - this.env.margin) / this.env.curveHeight() * this.steps)));
+		},
 		position: function() {
-			return {
-				x: this.env.margin + this.env.curveWidth() * this.name,
-				y: this.env.margin + (this.env.curveHeight() / this.steps) * this.value
-			};
+			if (this.handler) {
+				return {
+					x: this.handler.attr('cx'),
+					y: this.handler.attr('cy')
+				};
+			} else {
+				return {
+					x: this.env.margin + this.env.curveWidth() * this.name,
+					y: this.env.margin + (this.env.curveHeight() / this.steps) * this.value
+				};
+			}
+		},
+		// Creates a basic point
+		drawPoint: function(name) {
+			this.handler = this.env.paper.circle(this.position().x, this.position().y, this.handlerRadius)
+			jQuery(this.handler.node).attr('id', name);
+			this.handler.selector = this;
+
+			this.handler.attr({
+				stroke: null,
+				fill: '#DDD',
+				opacity: 0
+			})
+			this.handler.hover(function() {
+				this.animate({
+					opacity: 0.5
+				}, 500, '>');
+			}, function() {
+				this.animate({
+					opacity: 0
+				}, 500, '<');
+			});
+
+			this.handler.drag(this.pointMove, this.pointMoveStart, this.pointMoveEnd);
+		},
+
+		pointMove: function(dx, dy) {
+			this.selector.handler.attr({
+				cy: this.selector.tmp_pos + dy
+			});
+			this.selector.updateCurves();
+		},
+
+		pointMoveStart: function(dx, dy) {
+			this.selector.tmp_pos = dy;
+			this.selector.handler.animate({
+				opacity: 0.5
+			});
+		},
+
+		pointMoveEnd: function() {
+			this.selector.setValue();
+			this.selector.handler.animate({
+				opacity: 0
+			});
+		},
+
+		updateCurves: function(delay) {
+			console.log("updateCurves");
+			this.env.curves[this.name - 0.5].update(delay);
+			this.env.curves[this.name + 0.5].update(delay);
 		}
 
 	};
@@ -88,19 +164,17 @@ var BezierSelectorCurve = function(args) {
 		B: null,
 		Ac: null,
 		Bc: null,
+		path: null,
 
 		setup: function(args) {
 			jQuery.each(args, function(k, v) {
 				_[k] = v;
 			});
-
-			console.log(this.env.curveWidth());
-
 			if (this.start) {
 				this.A = this.start.position();
 			} else {
 				this.A = {
-					x: this.env.margin + this.env.curveWidth() * (this.name - 1),
+					x: this.env.margin,
 					y: this.env.margin + this.env.curveHeight()
 				};
 			}
@@ -113,7 +187,7 @@ var BezierSelectorCurve = function(args) {
 				this.B = this.end.position();
 			} else {
 				this.B = {
-					x: this.env.margin + this.env.curveWidth() * (this.name - 1),
+					x: this.env.width - this.env.margin,
 					y: this.env.margin + this.env.curveHeight()
 				};
 			}
@@ -128,8 +202,24 @@ var BezierSelectorCurve = function(args) {
 
 		// Draw the curve and control paths if necessary
 		draw: function() {
-			console.log(this.A);
-			this.env.paper.path(this.connectPath()).toBack();
+			this.path = this.env.paper.path(this.connectPath()).toBack();
+		},
+		update: function(delay) {
+
+			if (this.start) {
+				this.A.y = this.start.position().y;
+			}
+			this.Ac.y = this.A.y;
+
+			if (this.end) {
+				this.B.y = this.end.position().y;
+			}
+			this.Bc.y = this.B.y;
+
+			this.path.animate({
+				path: this.connectPath()
+			}, delay ? delay : 1);
+
 		},
 
 		// Return the path options for the curve between the two points
@@ -141,69 +231,10 @@ var BezierSelectorCurve = function(args) {
 			p.push(" " + this.Bc.x + " " + this.Bc.y);
 			p.push(" " + this.B.x + " " + this.B.y);
 			path = p.join('');
-			console.log(path);
-			$('#pathString').html(path);
+
 			return path;
 		},
 
-		control1Path: function() {
-			var p = [];
-			p.push("M" + this.A.x + " " + this.A.y + " ");
-			p.push("L" + this.Ac.x + " " + this.Ac.y);
-			return p.join('');
-		},
-
-		control2Path: function() {
-			var p = [];
-			p.push("M" + this.B.x + " " + this.B.y + " ");
-			p.push("L" + this.Bc.x + " " + this.Bc.y);
-			return p.join('');
-		},
-
-		movingEl: null,
-		pointX: 0,
-		pointY: 0,
-
-		pointMoveStart: function(x, y, event) {
-			CURVE.movingEl = $('#' + event.target.id);
-			CURVE.pointX = event.offsetX;
-			CURVE.pointY = event.offsetY;
-		},
-
-		pointMoveEnd: function() {},
-
-		pointMove: function(dx, dy) {
-			var elId = CURVE.movingEl.attr('id');
-			$('#' + elId + 'X').val(CURVE.pointX + dx);
-			$('#' + elId + 'Y').val(CURVE.pointY + dy);
-			CURVE.drawCurve();
-		},
-
-		// Helper methods
-		startX: function() {
-			return parseInt($('#startX').val(), 10);
-		},
-		startY: function() {
-			return parseInt($('#startY').val(), 10);
-		},
-		control1X: function() {
-			return parseInt($('#control1X').val(), 10);
-		},
-		control1Y: function() {
-			return parseInt($('#control1Y').val(), 10);
-		},
-		control2X: function() {
-			return parseInt($('#control2X').val(), 10);
-		},
-		control2Y: function() {
-			return parseInt($('#control2Y').val(), 10);
-		},
-		endX: function() {
-			return parseInt($('#endX').val(), 10);
-		},
-		endY: function() {
-			return parseInt($('#endY').val(), 10);
-		}
 	};
 	return _.setup(args);
 };
